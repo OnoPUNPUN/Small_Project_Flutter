@@ -1,3 +1,4 @@
+import 'package:cgpa_calculator/cgpa_page.dart';
 import 'package:cgpa_calculator/widgets/crouse_card.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +13,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
   final TextEditingController crouseNameController = TextEditingController();
   final TextEditingController creaditController = TextEditingController();
   final TextEditingController markController = TextEditingController();
-  late double totalMarks = 0;
-  late int totalCreadit = 0;
-  late double cgpa = 0;
 
   final List<Map<String, dynamic>> courses = [];
 
@@ -29,18 +27,64 @@ class _CalculatorPageState extends State<CalculatorPage> {
   void _addCourse() {
     final name = crouseNameController.text.trim();
     final credit = int.tryParse(creaditController.text.trim());
-    final mark = double.tryParse(markController.text.trim());
+    final markPerSub = double.tryParse(markController.text.trim());
 
-    if (name.isNotEmpty && credit != null && mark != null) {
-      totalMarks += mark;
-      totalCreadit += credit;
+    if (name.isNotEmpty && credit != null && markPerSub != null) {
       setState(() {
-        courses.add({'name': name, 'credit': credit, 'mark': mark});
+        courses.add({'name': name, 'credit': credit, 'mark': markPerSub});
       });
       crouseNameController.clear();
       creaditController.clear();
       markController.clear();
     }
+  }
+
+  double _gpa(double marks) {
+    if (marks >= 90 && marks <= 100) {
+      return 4.0;
+    } else if (marks >= 85 && marks < 90) {
+      return 3.75;
+    } else if (marks >= 80 && marks < 85) {
+      return 3.50;
+    } else if (marks >= 75 && marks < 80) {
+      return 3.25;
+    } else if (marks >= 70 && marks < 75) {
+      return 3.00;
+    } else {
+      return 0.0;
+    }
+  }
+
+  double _calculateCGPA() {
+    double totalMarks = 0.0;
+    double totalCredits = 0.0;
+
+    for (var course in courses) {
+      final double mark = course['mark'];
+      final double credit = course['credit'].toDouble();
+      totalMarks += _gpa(mark) * credit;
+      totalCredits += credit;
+    }
+    if (totalCredits == 0) return 0.0;
+    return totalMarks / totalCredits;
+  }
+
+  // double _calculateTotalMarks() {
+  //   double totalMarks = 0.0;
+  //   for (var course in courses) {
+  //     final double mark = course['mark'];
+  //     final double credit = course['credit'].toDouble();
+  //     totalMarks += _gpa(mark) * credit;
+  //   }
+  //   return totalMarks;
+  // }
+
+  double _calculateTotalCredits() {
+    double totalCredits = 0.0;
+    for (var course in courses) {
+      totalCredits += course['credit'].toDouble();
+    }
+    return totalCredits;
   }
 
   @override
@@ -56,11 +100,53 @@ class _CalculatorPageState extends State<CalculatorPage> {
         ),
         centerTitle: true,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addCourse,
-        backgroundColor: Colors.deepPurple,
-        tooltip: 'Add Course',
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          FloatingActionButton(
+            onPressed: _addCourse,
+            backgroundColor: Colors.deepPurple,
+            tooltip: 'Add Course',
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 70.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple.shade700,
+                foregroundColor: Colors.white,
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+              ),
+              onPressed: () {
+                final cgpa = _calculateCGPA();
+                // final marks = _calculateTotalMarks();
+                final credits = _calculateTotalCredits();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => CgpaPage(
+                          cgpa: cgpa,
+                          // marks: marks,
+                          credits: credits,
+                        ),
+                  ),
+                );
+              },
+              child: const Text(
+                'Show CGPA',
+                style: TextStyle(fontSize: 16, letterSpacing: 1.1),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: const BoxDecoration(
