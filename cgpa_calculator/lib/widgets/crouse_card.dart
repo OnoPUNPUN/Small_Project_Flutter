@@ -1,56 +1,49 @@
 import 'package:flutter/material.dart';
 
 class CrouseCard extends StatelessWidget {
-  const CrouseCard({super.key});
+  final String courseName;
+  final int credit;
+  final double mark;
+
+  const CrouseCard({
+    super.key,
+    required this.courseName,
+    required this.credit,
+    required this.mark,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      decoration: BoxDecoration(
-        color: Colors.purple[200],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 6)],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Text(
-                  "Cs",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Spacer(),
-                Icon(Icons.edit, color: Colors.white),
-              ],
-            ),
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        leading: Container(
+          decoration: BoxDecoration(
+            color: Colors.deepPurple.shade50,
+            borderRadius: BorderRadius.circular(12),
           ),
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Current CGPA : 4.00',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Total Creadits : 4',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-              ],
-            ),
+          padding: const EdgeInsets.all(10),
+          child: const Icon(Icons.book, color: Colors.deepPurple),
+        ),
+        title: Text(
+          courseName,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
           ),
-        ],
+        ),
+        subtitle: Text(
+          'Credit: $credit\nMark: $mark',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black54,
+            letterSpacing: 0.5,
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: Colors.deepPurple),
       ),
     );
   }
